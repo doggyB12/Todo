@@ -4,8 +4,10 @@ import com.project.Todo.dto.TodoDTO;
 import com.project.Todo.entity.Todo;
 import com.project.Todo.exception.NotFoundException;
 import com.project.Todo.repository.TodoRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,4 +44,5 @@ public class TodoService {
         todo.setTitle(todoDTO.getTitle());
         return todoRepository.save(todo);
     }
+
 }
