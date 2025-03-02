@@ -11,8 +11,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/todo/")
 public class TodoAPI {
+    private final TodoService todoService;
+
     @Autowired
-    TodoService todoService;
+    public TodoAPI(TodoService todoService) {
+        this.todoService = todoService;
+    }
 
     @GetMapping
     public ResponseEntity getTodo()

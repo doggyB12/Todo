@@ -22,7 +22,7 @@ public class Todo {
     private Long id;
 
     @NotBlank(message = "Title must not be blank")
-    @Pattern(regexp = "^[0-9A-Za-z\\s.,]{0,50}$", message = "Title todo must not exceed 50 characters")
+    @Pattern(regexp = "^[0-9A-Za-z\\s.,]{1,50}$", message = "Title todo must not exceed 50 characters")
     @Pattern(regexp = "^[0-9A-Za-z\\s.,]*$", message = "Title todo must not contain special characters")
     private String title;
 
