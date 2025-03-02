@@ -27,6 +27,7 @@ This is a simple Todo application built with Java and Spring Boot. The applicati
    src/test/java/com/project/Todo
    ```
    Because repository implements from JpaRepository -> maybe do not need to write test :)
+   
    Files include:
    ```bash
        src
@@ -41,9 +42,12 @@ This is a simple Todo application built with Java and Spring Boot. The applicati
                    └── service
                        └── TodoServiceTest.java
    ```
-8) Test Coverage
+9) Test Coverage
    To check the test coverage in IntelliJ IDEA:
+   
    Right-click on the src/test/java directory or a specific test class.
+   
    Select Run 'All Tests' with Coverage or Run 'SpecificTest' with Coverage.
+   
    After the tests run, you can view the coverage report.
 
