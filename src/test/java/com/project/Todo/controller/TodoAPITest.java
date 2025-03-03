@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -29,14 +30,8 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 public class TodoAPITest {
 
-
-    @InjectMocks
-    private TodoService todoService;
-
     @Autowired
     private Validator validator;
-
-
 
     //---------------Get-----4 testcases--------------
     //1 - Returns HTTP 200 OK status when successfully retrieving todos - HappyCase
@@ -488,4 +483,76 @@ public class TodoAPITest {
         verify(todoService).updateTodoById(todoId, todoDTO);
     }
 
+
+    //------------Update complete----4 testcases------------
+    //1 - HappyCase - Return 200 OK status with updated todo in response body
+    @Test
+    public void test_update_todo_complete_returns_200_ok() {
+        // Arrange
+        Long todoId = 1L;
+        Todo todo = new Todo();
+        todo.setId(todoId);
+        todo.setTitle("Sample Todo");
+        todo.setCompleted(false);
+        todo.setStatus(true);
+
+        TodoService todoService = mock(TodoService.class);
+        when(todoService.updateTodoComplete(todoId)).thenReturn(todo);
+
+        TodoAPI controller = new TodoAPI(todoService);
+        ReflectionTestUtils.setField(controller, "todoService", todoService);
+
+        // Act
+        ResponseEntity response = controller.updateTodoComplete(todoId);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(todo, response.getBody());
+    }
+
+    //2 - Handle request with non-existent todo ID
+    @Test
+    public void test_update_complete_nonexistent_todo() {
+        TodoService todoService = mock(TodoService.class);
+        TodoAPI todoAPI = new TodoAPI(todoService);
+
+        when(todoService.updateTodoComplete(999L)).thenThrow(new NotFoundException("Not found"));
+
+        assertThrows(NotFoundException.class, () -> {
+            todoAPI.updateTodoComplete(999L);
+        });
+
+        verify(todoService).updateTodoComplete(999L);
+    }
+
+    //3 - Handle request with null ID
+    @Test
+    public void test_update_todo_complete_with_null_id() {
+        TodoService todoService = mock(TodoService.class);
+        TodoAPI todoAPI = new TodoAPI(todoService);
+
+        when(todoService.updateTodoComplete(null)).thenThrow(new IllegalArgumentException("ID cannot be null"));
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            todoAPI.updateTodoComplete(null);
+        });
+
+        assertEquals("ID cannot be null", exception.getMessage());
+        verify(todoService).updateTodoComplete(null);
+    }
+
+    //4 - Handle request with invalid ID format
+    @Test
+    public void test_update_todo_complete_with_invalid_id_format() {
+        TodoService todoService = mock(TodoService.class);
+        TodoAPI todoAPI = new TodoAPI(todoService);
+
+        String invalidId = "invalid_id";
+
+        assertThrows(NumberFormatException.class, () -> {
+            todoAPI.updateTodoComplete(Long.parseLong(invalidId));
+        });
+
+        verify(todoService, never()).updateTodoComplete(anyLong());
+    }
 }

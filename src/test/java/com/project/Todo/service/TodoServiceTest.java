@@ -255,7 +255,7 @@ public class TodoServiceTest {
         verify(todoRepository, never()).save(any(Todo.class));
     }
 
-    //----------Update----3 testcases------
+//----------Update----3 testcases------
     //1 - HappyCase - Successfully update todo title when valid ID and todoDTO are provided
     @Test
     public void test_update_todo_title_success() {
@@ -325,6 +325,83 @@ public class TodoServiceTest {
         assertEquals("New Title", updatedTodo.getTitle());
         assertFalse(updatedTodo.isCompleted());
         assertTrue(updatedTodo.isStatus());
+    }
+
+    //-------------Update Complete--------------
+    // Toggle completed status from false to true for existing todo
+    @Test
+    public void test_toggle_completed_status_from_false_to_true() {
+
+        Todo todo = new Todo();
+        todo.setId(1L);
+        todo.setCompleted(false);
+
+        when(todoRepository.findTodoById(1L)).thenReturn(Optional.of(todo));
+        when(todoRepository.save(any(Todo.class))).thenReturn(todo);
+
+        // Act
+        Todo result = todoService.updateTodoComplete(1L);
+
+        // Assert
+        assertTrue(result.isCompleted());
+        verify(todoRepository).save(todo);
+    }
+
+    // Toggle completed status from true to false for existing todo
+    @Test
+    public void test_toggle_completed_status_from_true_to_false() {
+        Todo todo = new Todo();
+        todo.setId(1L);
+        todo.setCompleted(true);
+
+        when(todoRepository.findTodoById(1L)).thenReturn(Optional.of(todo));
+        when(todoRepository.save(any(Todo.class))).thenReturn(todo);
+
+        // Act
+        Todo result = todoService.updateTodoComplete(1L);
+
+        // Assert
+        assertFalse(result.isCompleted());
+        verify(todoRepository).save(todo);
+    }
+
+    // Handle non-existent todo ID by throwing NotFoundException
+    @Test
+    public void test_throw_not_found_exception_for_invalid_id() {
+
+        when(todoRepository.findTodoById(999L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> {
+            todoService.updateTodoComplete(999L);
+        });
+        verify(todoRepository, never()).save(any(Todo.class));
+    }
+
+    // Handle case when repository save operation fails
+    @Test
+    public void test_update_todo_complete_save_failure() {
+
+        Todo todo = new Todo();
+        todo.setId(1L);
+        todo.setCompleted(false);
+
+        when(todoRepository.findTodoById(1L)).thenReturn(Optional.of(todo));
+        when(todoRepository.save(any(Todo.class))).thenThrow(new RuntimeException("Save operation failed"));
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> {
+            todoService.updateTodoComplete(1L);
+        });
+        verify(todoRepository).save(todo);
+    }
+
+    // Handle null ID parameter
+    @Test
+    public void test_update_todo_complete_with_null_id() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            todoService.updateTodoComplete(null);
+        });
     }
 
 //    //Handle TodoDTO with title longer than 50 characters
