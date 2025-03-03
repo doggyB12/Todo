@@ -45,4 +45,17 @@ public class TodoService {
         return todoRepository.save(todo);
     }
 
+    public Todo updateTodoComplete(Long id)
+    {
+        Todo todo = todoRepository.findTodoById(id).orElseThrow(() -> new NotFoundException("Not found"));
+        if(todo.isCompleted())
+        {
+            todo.setCompleted(false);
+        }else
+        {
+            todo.setCompleted(true);
+        }
+        return todoRepository.save(todo);
+    }
+
 }

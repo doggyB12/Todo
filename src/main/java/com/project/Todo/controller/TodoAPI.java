@@ -42,4 +42,10 @@ public class TodoAPI {
         Todo todo = todoService.updateTodoById(id, todoDTO);
         return ResponseEntity.ok(todo);
     }
+
+    @PutMapping("/setcomplete/{id}")
+    public ResponseEntity updateTodoComplete(@PathVariable Long id) {
+        Todo todo = todoService.updateTodoComplete(id);
+        return ResponseEntity.ok(todo);
+    }
 }
